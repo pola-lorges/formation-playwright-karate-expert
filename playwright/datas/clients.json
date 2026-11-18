@@ -1,0 +1,12 @@
+[
+  { "id": "mock-client-001", "name": "QA Client Alpha", "city": "Bafoussam", "country": "Cameroun" },
+  { "id": "mock-client-002", "name": "QA Client Bravo", "city": "Douala", "country": "Cameroun" },
+  { "id": "mock-client-003", "name": "QA Client Charlie", "city": "Yaounde", "country": "Cameroun" },
+  { "id": "mock-client-004", "name": "QA Client Delta", "city": "Garoua", "country": "Cameroun" },
+  { "id": "mock-client-005", "name": "QA Client Echo", "city": "Maroua", "country": "Cameroun" },
+  { "id": "mock-client-006", "name": "QA Client Foxtrot", "city": "Bamenda", "country": "Cameroun" },
+  { "id": "mock-client-007", "name": "QA Client Golf", "city": "Bertoua", "country": "Cameroun" },
+  { "id": "mock-client-008", "name": "QA Client Hotel", "city": "Ebolowa", "country": "Cameroun" },
+  { "id": "mock-client-009", "name": "QA Client India", "city": "Ngaoundere", "country": "Cameroun" },
+  { "id": "mock-client-010", "name": "QA Client Juliet", "city": "Kribi", "country": "Cameroun" }
+]

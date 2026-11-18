@@ -1,0 +1,26 @@
+{
+  "name": "senior-qa-playwright",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "test": "playwright test",
+    "test:j01": "playwright test --grep @J01",
+    "test:j02": "playwright test --grep @J02",
+    "test:j03": "playwright test --grep @J03",
+    "test:j04": "playwright test --grep @J04",
+    "test:j05": "playwright test --grep @J05",
+    "test:j06": "playwright test --grep @J06",
+    "test:j07": "playwright test --grep @J07",
+    "test:j08": "playwright test --grep @J08",
+    "test:ui": "playwright test --ui",
+    "test:headed": "playwright test --headed",
+    "test:report": "playwright show-report playwright-report",
+    "install:browsers": "playwright install"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.56.1",
+    "@types/node": "^24.10.1",
+    "dotenv": "^16.4.7",
+    "typescript": "^5.9.3"
+  }
+}
