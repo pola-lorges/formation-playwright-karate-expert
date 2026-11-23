@@ -17,6 +17,7 @@
     "test:smoke": "playwright test --grep @smoke",
     "test:regression": "playwright test --grep @regression",
     "test:e2e": "playwright test --grep @e2e",
+    "test:perf": "playwright test --grep @perf",
     "report:kpi": "node scripts/kpi.mjs",
     "report:failures": "node scripts/failure-triage.mjs",
     "test:ui": "playwright test --ui",

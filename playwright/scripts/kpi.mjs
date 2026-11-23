@@ -14,6 +14,29 @@ const failureTriage = existsSync(failureTriageUrl)
   ? JSON.parse(readFileSync(failureTriageUrl, 'utf8'))
   : null;
 const stats = results.stats;
+const performanceMetrics = [];
+
+function collectPerformanceMetrics(suite) {
+  for (const spec of suite.specs ?? []) {
+    for (const test of spec.tests ?? []) {
+      for (const annotation of test.annotations ?? []) {
+        if (annotation.type !== 'performance') continue;
+        try {
+          performanceMetrics.push({
+            test: spec.title,
+            project: test.projectName,
+            ...JSON.parse(annotation.description),
+          });
+        } catch {
+          console.warn(`Invalid performance annotation in test: ${spec.title}`);
+        }
+      }
+    }
+  }
+  for (const child of suite.suites ?? []) collectPerformanceMetrics(child);
+}
+
+for (const suite of results.suites ?? []) collectPerformanceMetrics(suite);
 
 const passed = stats.expected ?? 0;
 const failed = stats.unexpected ?? 0;
@@ -32,6 +55,7 @@ const dashboard = {
     cleanPassRatePercent: cleanPassRate,
     flakyRatePercent: executed ? Number(((flaky / executed) * 100).toFixed(1)) : 0,
     durationMinutes,
+    performance: performanceMetrics,
   },
 };
 
@@ -91,6 +115,21 @@ const triageContent = failureTriage
 const triageReportLink = failureTriage
   ? '<a class="text-link" href="../test-results/failure-triage.md">Ouvrir le rapport Markdown complet</a>'
   : '';
+const performanceContent = performanceMetrics.length
+  ? performanceMetrics.map(metric => `
+      <article class="metric performance-metric ${metric.navigation?.loadEventMs > (metric.budgets?.pageLoadMs ?? Infinity) || metric.customersApi?.durationMs > (metric.budgets?.customersApiMs ?? Infinity) ? 'watch' : 'good'}">
+        <p class="metric-label">${escapeHtml(metric.page)} · ${escapeHtml(metric.project)}</p>
+        <p class="metric-value">${metric.navigation?.loadEventMs ?? 'N/D'}<span style="font-size:16px"> ms</span></p>
+        <p class="metric-note">Chargement page · budget indicatif ${metric.budgets?.pageLoadMs ?? 'N/D'} ms${metric.navigation?.loadEventMs > (metric.budgets?.pageLoadMs ?? Infinity) ? ' · À surveiller' : ' · OK'}</p>
+        <p class="metric-note">TTFB ${metric.navigation?.ttfbMs ?? 'N/D'} ms · DOM ready ${metric.navigation?.domContentLoadedMs ?? 'N/D'} ms</p>
+        <p class="metric-note">API Clients ${metric.customersApi ? `${escapeHtml(metric.customersApi.endpoint)} · ${metric.customersApi.durationMs} ms · HTTP ${metric.customersApi.status}${metric.customersApi.durationMs > (metric.budgets?.customersApiMs ?? Infinity) ? ' · À surveiller' : ' · OK'}` : 'non observée pendant ce parcours'}</p>
+        <details>
+          <summary>${metric.apiResponses?.length ?? 0} requête(s) fetch/XHR observée(s)</summary>
+          <ul>${(metric.apiResponses ?? []).map(response => `<li>${escapeHtml(response.endpoint)} · ${response.durationMs} ms · HTTP ${response.status}</li>`).join('') || '<li>Aucune requête fetch/XHR</li>'}</ul>
+        </details>
+        <p class="metric-note">Budget API indicatif ${metric.budgets?.customersApiMs ?? 'N/D'} ms; signal seulement</p>
+      </article>`).join('')
+  : '<p class="no-failures">Aucune mesure de performance dans ce run. Lance <code>npm run test:perf</code> pour mesurer le parcours Clients.</p>';
 
 const html = `<!doctype html>
 <html lang="fr">
@@ -189,6 +228,7 @@ const html = `<!doctype html>
     .evidence-links { display: flex; flex-wrap: wrap; gap: 8px 14px; font-size: 12px; }
     .evidence-links a, .text-link { color: var(--teal); font-weight: 700; }
     .no-failures { padding: 16px 18px; border: 1px solid var(--line); border-radius: 6px; background: #fff; }
+    .performance-metric { border-top-color: var(--teal); }
     @media (max-width: 760px) {
       main { width: min(100% - 28px, 560px); padding-top: 28px; }
       header { flex-direction: column; }
@@ -250,6 +290,13 @@ const html = `<!doctype html>
         <span>Flaky <strong>${flaky}</strong></span>
         <span>Ignorés <strong>${skipped}</strong></span>
       </div>
+    </section>
+    <section aria-labelledby="performance-title">
+      <div class="section-heading">
+        <h2 id="performance-title">Mesures de performance · ${performanceMetrics.length}</h2>
+        <p>Signaux indicatifs, non bloquants</p>
+      </div>
+      <div class="grid">${performanceContent}</div>
     </section>
     <section aria-labelledby="triage-title">
       <div class="section-heading">
