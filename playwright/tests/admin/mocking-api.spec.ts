@@ -161,3 +161,54 @@ test('J09 attendre les clients malgré une latence variable', { tag: '@J09' }, a
   await page.goto('/clients');
   await expect(page.getByText('QA Flaky Client', { exact: true })).toBeVisible();
 });
+
+test('J10 diagnostiquer l’affichage d’un client', { tag: '@J10' }, async ({ page }, testInfo) => {
+  const mockedResponse = {
+    success: true,
+    message: 'Customers retrieved successfully',
+    data: {
+      content: [{
+        id: 'mock-diagnostic-client',
+        name: 'QA Diagnostic Client',
+        address1: { line: 'Yaounde', country: 'Cameroun' },
+        address2: null,
+        address3: null,
+        logoUrl: null,
+      }],
+      empty: false,
+      first: true,
+      last: true,
+      number: 0,
+      numberOfElements: 1,
+      pageable: {},
+      size: 10,
+      sort: {},
+      totalElements: 1,
+      totalPages: 1,
+    },
+    timestamp: new Date().toISOString(),
+    path: '/api/v1/customers',
+    errorCode: null,
+  };
+
+  await page.route(customersUrl, route => route.fulfill({
+    status: 200,
+    contentType: 'application/json',
+    body: JSON.stringify(mockedResponse),
+  }));
+
+  await test.step('Ouvrir la liste des clients', async () => {
+    await page.goto('/clients');
+  });
+
+  await test.step('Joindre la réponse API simulée au rapport', async () => {
+    await testInfo.attach('customers-api-response', {
+      body: Buffer.from(JSON.stringify(mockedResponse, null, 2)),
+      contentType: 'application/json',
+    });
+  });
+
+  await test.step('Vérifier le client renvoyé par l’API', async () => {
+    await expect(page.getByText('QA Diagnostic Client w', { exact: true })).toBeVisible();
+  });
+});
