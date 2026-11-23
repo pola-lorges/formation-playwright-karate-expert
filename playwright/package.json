@@ -18,9 +18,10 @@
     "test:regression": "playwright test --grep @regression",
     "test:e2e": "playwright test --grep @e2e",
     "report:kpi": "node scripts/kpi.mjs",
+    "report:failures": "node scripts/failure-triage.mjs",
     "test:ui": "playwright test --ui",
     "test:headed": "playwright test --headed",
-    "test:report": "npm run report:kpi && playwright show-report playwright-report",
+    "test:report": "npm run report:failures && npm run report:kpi && playwright show-report playwright-report",
     "install:browsers": "playwright install"
   },
   "devDependencies": {

@@ -2,6 +2,7 @@ import { existsSync, mkdirSync, readFileSync, renameSync, writeFileSync } from '
 import { fileURLToPath } from 'node:url';
 
 const resultsUrl = new URL('../test-results/playwright-results.json', import.meta.url);
+const failureTriageUrl = new URL('../test-results/failure-triage.json', import.meta.url);
 const dashboardUrl = new URL('../test-results/quality-kpis.json', import.meta.url);
 const publicDirectoryUrl = new URL('../public/', import.meta.url);
 const htmlDashboardUrl = new URL('../public/index.html', import.meta.url);
@@ -9,6 +10,9 @@ const reportDirectoryUrl = new URL('../playwright-report/', import.meta.url);
 const reportIndexUrl = new URL('../playwright-report/index.html', import.meta.url);
 const reportDetailsUrl = new URL('../playwright-report/playwright-details.html', import.meta.url);
 const results = JSON.parse(readFileSync(resultsUrl, 'utf8'));
+const failureTriage = existsSync(failureTriageUrl)
+  ? JSON.parse(readFileSync(failureTriageUrl, 'utf8'))
+  : null;
 const stats = results.stats;
 
 const passed = stats.expected ?? 0;
@@ -48,6 +52,44 @@ const generatedDate = new Intl.DateTimeFormat('fr-FR', {
 }).format(new Date(dashboard.generatedAt));
 const pipelineLink = dashboard.pipelineUrl
   ? `<a class="pipeline-link" href="${dashboard.pipelineUrl}">Ouvrir la pipeline GitLab</a>`
+  : '';
+const escapeHtml = value => String(value ?? '').replace(/[&<>"']/g, character => ({
+  '&': '&amp;',
+  '<': '&lt;',
+  '>': '&gt;',
+  '"': '&quot;',
+  "'": '&#39;',
+}[character]));
+const failureItems = failureTriage?.failures ?? [];
+const confidenceLabel = { high: 'élevée', medium: 'moyenne', low: 'faible' };
+const triageContent = failureTriage
+  ? failureItems.length
+    ? failureItems.map(failure => `
+        <article class="failure-item">
+          <div class="failure-topline">
+            <h3>${escapeHtml(failure.title)}</h3>
+            <span class="category">${escapeHtml(failure.classification.category)}</span>
+          </div>
+          <p class="failure-location">${escapeHtml(failure.file)}${failure.line ? `:${failure.line}` : ''} · ${escapeHtml(failure.project)} · ${escapeHtml(failure.status)}</p>
+          <dl class="failure-details">
+            <div><dt>Confiance</dt><dd>${escapeHtml(confidenceLabel[failure.classification.confidence] ?? failure.classification.confidence)}</dd></div>
+            <div><dt>Responsable suggéré</dt><dd>${escapeHtml(failure.classification.owner)}</dd></div>
+          </dl>
+          <p class="failure-action"><strong>Action proposée :</strong> ${escapeHtml(failure.classification.action)}</p>
+          <details>
+            <summary>Voir le message d’erreur et les preuves</summary>
+            <pre>${escapeHtml(failure.error)}</pre>
+            <div class="evidence-links">${failure.evidence.length
+    ? failure.evidence.map(item => item.path
+      ? `<a href="../${escapeHtml(item.path)}">${escapeHtml(item.name)}</a>`
+      : `<span>${escapeHtml(item.name)}</span>`).join('')
+    : '<span>Voir les artefacts du test dans le rapport Playwright</span>'}</div>
+          </details>
+        </article>`).join('')
+    : '<p class="no-failures">Aucun échec détecté dans ce run.</p>'
+  : '<p class="no-failures">Le triage n’a pas encore été généré. Lance <code>npm run report:failures</code>, puis régénère le rapport.</p>';
+const triageReportLink = failureTriage
+  ? '<a class="text-link" href="../test-results/failure-triage.md">Ouvrir le rapport Markdown complet</a>'
   : '';
 
 const html = `<!doctype html>
@@ -130,6 +172,23 @@ const html = `<!doctype html>
       font-weight: 700;
       text-decoration: none;
     }
+    .triage-list { display: grid; gap: 10px; }
+    .failure-item { padding: 18px; border: 1px solid var(--line); border-left: 4px solid var(--red); border-radius: 6px; background: #fff; }
+    .failure-topline { display: flex; justify-content: space-between; align-items: flex-start; gap: 14px; }
+    .failure-topline h3 { margin: 0; font-size: 15px; overflow-wrap: anywhere; }
+    .category { flex: 0 0 auto; padding: 3px 8px; border-radius: 4px; background: #f9e9e7; color: var(--red); font-size: 12px; font-weight: 700; }
+    .failure-location { margin: 6px 0 12px; color: var(--muted); font-size: 12px; overflow-wrap: anywhere; }
+    .failure-details { display: flex; flex-wrap: wrap; gap: 8px 26px; margin: 0 0 12px; }
+    .failure-details div { display: flex; gap: 6px; }
+    .failure-details dt { color: var(--muted); }
+    .failure-details dd { margin: 0; font-weight: 700; }
+    .failure-action { margin: 0 0 12px; }
+    .failure-item details { border-top: 1px solid var(--line); padding-top: 10px; }
+    .failure-item summary { color: var(--teal); cursor: pointer; font-size: 13px; font-weight: 700; }
+    .failure-item pre { max-height: 230px; overflow: auto; padding: 12px; border-radius: 4px; background: #f3f6f3; color: var(--ink); font: 12px/1.45 ui-monospace, SFMono-Regular, Menlo, monospace; white-space: pre-wrap; overflow-wrap: anywhere; }
+    .evidence-links { display: flex; flex-wrap: wrap; gap: 8px 14px; font-size: 12px; }
+    .evidence-links a, .text-link { color: var(--teal); font-weight: 700; }
+    .no-failures { padding: 16px 18px; border: 1px solid var(--line); border-radius: 6px; background: #fff; }
     @media (max-width: 760px) {
       main { width: min(100% - 28px, 560px); padding-top: 28px; }
       header { flex-direction: column; }
@@ -191,6 +250,13 @@ const html = `<!doctype html>
         <span>Flaky <strong>${flaky}</strong></span>
         <span>Ignorés <strong>${skipped}</strong></span>
       </div>
+    </section>
+    <section aria-labelledby="triage-title">
+      <div class="section-heading">
+        <h2 id="triage-title">Triage des échecs · ${failureTriage?.totalFailures ?? '—'}</h2>
+        ${triageReportLink}
+      </div>
+      <div class="triage-list">${triageContent}</div>
     </section>
     <a class="details-link" href="playwright-details.html">Consulter le rapport détaillé Playwright</a>
     <footer>

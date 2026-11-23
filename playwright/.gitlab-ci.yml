@@ -23,6 +23,7 @@ playwright-tests:
     - npm ci --cache .npm --prefer-offline
     - npx playwright test
   after_script:
+    - cd playwright && npm run report:failures || echo "Playwright failure triage report could not be generated"
     - cd playwright && npm run report:kpi || echo "Playwright KPI report could not be generated"
   artifacts:
     when: always
