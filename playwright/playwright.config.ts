@@ -10,6 +10,10 @@ if (!baseURL) {
 
 export default defineConfig({
   testDir: './tests',
+  fullyParallel: true,
+  workers: process.env.PLAYWRIGHT_WORKERS
+    ? Number(process.env.PLAYWRIGHT_WORKERS)
+    : process.env.CI ? 2 : undefined,
   timeout: 30_000,
   retries: process.env.CI ? 2 : 0,
   reporter: [['list'], ['html', { outputFolder: 'playwright-report', open: 'never' }]],
