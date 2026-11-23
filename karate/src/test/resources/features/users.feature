@@ -1,3 +1,4 @@
+@smoke @regression
 Feature: Users API
 
   Background:

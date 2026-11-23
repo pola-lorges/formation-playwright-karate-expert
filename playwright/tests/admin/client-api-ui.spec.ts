@@ -4,7 +4,7 @@ import { env } from '../../utils/env';
 
 test.use({ storageState: { cookies: [], origins: [] } });
 
-test('se connecter par API, lire /users/me et ouvrir Clients dans PAWK', { tag: '@J06' }, async ({ page }) => {
+test('se connecter par API, lire /users/me et ouvrir Clients dans PAWK', { tag: ['@J06', '@smoke', '@regression'] }, async ({ page }) => {
   await page.goto('/login');
   await page.getByLabel('Email').waitFor();
   await page.waitForFunction(() => Boolean(sessionStorage.getItem('csrf-token')));

@@ -42,7 +42,7 @@ async function mockCustomerFailure(
   return requests;
 }
 
-test('afficher les clients renvoyés par une API simulée', { tag: '@J07' }, async ({ page }) => {
+test('afficher les clients renvoyés par une API simulée', { tag: ['@J07', '@regression'] }, async ({ page }) => {
   let interceptedRequests = 0;
 
   await page.route(customersUrl, async route => {
@@ -88,7 +88,7 @@ test('afficher les clients renvoyés par une API simulée', { tag: '@J07' }, asy
   expect(interceptedRequests).toBeGreaterThan(0);
 });
 
-test('afficher un état vide si l’API clients répond 400', { tag: '@J07' }, async ({ page }) => {
+test('afficher un état vide si l’API clients répond 400', { tag: ['@J07', '@regression'] }, async ({ page }) => {
   const requests = await mockCustomerFailure(page, { status: 400 });
   await page.goto('/clients');
 
@@ -96,7 +96,7 @@ test('afficher un état vide si l’API clients répond 400', { tag: '@J07' }, a
   expect(requests.customerRequests).toBeGreaterThan(0);
 });
 
-test('rediriger vers la connexion si le token est refusé et son refresh échoue', { tag: '@J07' }, async ({ page }) => {
+test('rediriger vers la connexion si le token est refusé et son refresh échoue', { tag: ['@J07', '@regression'] }, async ({ page }) => {
   const requests = await mockCustomerFailure(page, { status: 401 });
   await page.goto('/clients');
 
@@ -106,7 +106,7 @@ test('rediriger vers la connexion si le token est refusé et son refresh échoue
   expect(requests.refreshRequests).toBeGreaterThan(0);
 });
 
-test('afficher un état vide si l’API clients répond 500', { tag: '@J07' }, async ({ page }) => {
+test('afficher un état vide si l’API clients répond 500', { tag: ['@J07', '@regression'] }, async ({ page }) => {
   const requests = await mockCustomerFailure(page, { status: 500 });
   await page.goto('/clients');
 
@@ -114,7 +114,7 @@ test('afficher un état vide si l’API clients répond 500', { tag: '@J07' }, a
   expect(requests.customerRequests).toBeGreaterThan(0);
 });
 
-test('afficher un état vide si la requête clients expire', { tag: '@J07' }, async ({ page }) => {
+test('afficher un état vide si la requête clients expire', { tag: ['@J07', '@regression'] }, async ({ page }) => {
   const requests = await mockCustomerFailure(page, { timeout: true });
   await page.goto('/clients');
 
@@ -122,7 +122,7 @@ test('afficher un état vide si la requête clients expire', { tag: '@J07' }, as
   expect(requests.customerRequests).toBeGreaterThan(0);
 });
 
-test('J09 attendre les clients malgré une latence variable', { tag: '@J09' }, async ({ page }) => {
+test('J09 attendre les clients malgré une latence variable', { tag: ['@J09', '@regression'] }, async ({ page }) => {
   await page.route(customersUrl, async route => {
     await new Promise(resolve => setTimeout(resolve, Math.random() * 500));
     await route.fulfill({
@@ -162,7 +162,7 @@ test('J09 attendre les clients malgré une latence variable', { tag: '@J09' }, a
   await expect(page.getByText('QA Flaky Client', { exact: true })).toBeVisible();
 });
 
-test('J10 diagnostiquer l’affichage d’un client', { tag: '@J10' }, async ({ page }, testInfo) => {
+test('J10 diagnostiquer l’affichage d’un client', { tag: ['@J10', '@regression'] }, async ({ page }, testInfo) => {
   const mockedResponse = {
     success: true,
     message: 'Customers retrieved successfully',
@@ -209,6 +209,6 @@ test('J10 diagnostiquer l’affichage d’un client', { tag: '@J10' }, async ({ 
   });
 
   await test.step('Vérifier le client renvoyé par l’API', async () => {
-    await expect(page.getByText('QA Diagnostic Client w', { exact: true })).toBeVisible();
+    await expect(page.getByText('QA Diagnostic Client', { exact: true })).toBeVisible();
   });
 });

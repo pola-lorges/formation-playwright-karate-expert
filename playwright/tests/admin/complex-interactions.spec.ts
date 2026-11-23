@@ -11,7 +11,7 @@ const vividPng = Buffer.from(
   'base64',
 );
 
-test('prévisualiser le logo client sans créer de client', { tag: '@J05' }, async ({ page }) => {
+test('prévisualiser le logo client sans créer de client', { tag: ['@J05', '@regression'] }, async ({ page }) => {
   await page.goto('/clients');
   await page.getByRole('button', { name: 'Ajouter client' }).click();
 

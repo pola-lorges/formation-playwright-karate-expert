@@ -4,7 +4,7 @@ import { DashboardPage } from '../../pages/dashboard.page';
 import { LoginPage } from '../../pages/login.page';
 import { env } from '../../utils/env';
 
-test('créer un client et vérifier sa présence', { tag: '@J02' }, async ({ page }) => {
+test('créer un client et vérifier sa présence', { tag: ['@J02', '@smoke', '@regression', '@e2e'] }, async ({ page }) => {
   const loginPage = new LoginPage(page);
   const dashboardPage = new DashboardPage(page);
   const clientPage = new ClientPage(page);

@@ -3,7 +3,7 @@ import { DashboardPage } from '../../pages/dashboard.page';
 import { LoginPage } from '../../pages/login.page';
 import { env } from '../../utils/env';
 
-test('Login -> Dashboard -> Logout', { tag: ['@J01', '@J02'] }, async ({ page }) => {
+test('Login -> Dashboard -> Logout', { tag: ['@J01', '@J02', '@smoke', '@regression', '@e2e'] }, async ({ page }) => {
   const loginPage = new LoginPage(page);
   const dashboardPage = new DashboardPage(page);
 

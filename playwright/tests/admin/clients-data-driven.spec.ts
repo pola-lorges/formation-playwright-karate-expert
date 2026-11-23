@@ -15,7 +15,7 @@ const clients = JSON.parse(
 const customersUrl = 'https://api-prod.intranet-pawk.com/api/v1/customers**';
 
 for (const client of clients) {
-  test(`afficher ${client.name} a ${client.city}`, { tag: '@J08' }, async ({ page }) => {
+  test(`afficher ${client.name} a ${client.city}`, { tag: ['@J08', '@regression'] }, async ({ page }) => {
     let interceptedRequests = 0;
 
     await page.route(customersUrl, async route => {
