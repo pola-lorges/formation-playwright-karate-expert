@@ -12,6 +12,7 @@
     "test:j06": "playwright test --grep @J06",
     "test:j07": "playwright test --grep @J07",
     "test:j08": "playwright test --grep @J08",
+    "test:j09": "playwright test --grep @J09",
     "test:ui": "playwright test --ui",
     "test:headed": "playwright test --headed",
     "test:report": "playwright show-report playwright-report",

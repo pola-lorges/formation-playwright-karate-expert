@@ -121,3 +121,43 @@ test('afficher un état vide si la requête clients expire', { tag: '@J07' }, as
   await expect(page.getByText('Aucun client trouvé', { exact: true })).toBeVisible();
   expect(requests.customerRequests).toBeGreaterThan(0);
 });
+
+test('J09 attendre les clients malgré une latence variable', { tag: '@J09' }, async ({ page }) => {
+  await page.route(customersUrl, async route => {
+    await new Promise(resolve => setTimeout(resolve, Math.random() * 500));
+    await route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify({
+        success: true,
+        message: 'Customers retrieved successfully',
+        data: {
+          content: [{
+            id: 'mock-flaky-client',
+            name: 'QA Flaky Client',
+            address1: { line: 'Douala', country: 'Cameroun' },
+            address2: null,
+            address3: null,
+            logoUrl: null,
+          }],
+          empty: false,
+          first: true,
+          last: true,
+          number: 0,
+          numberOfElements: 1,
+          pageable: {},
+          size: 10,
+          sort: {},
+          totalElements: 1,
+          totalPages: 1,
+        },
+        timestamp: new Date().toISOString(),
+        path: '/api/v1/customers',
+        errorCode: null,
+      }),
+    });
+  });
+
+  await page.goto('/clients');
+  await expect(page.getByText('QA Flaky Client', { exact: true })).toBeVisible();
+});
