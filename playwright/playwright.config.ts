@@ -16,7 +16,12 @@ export default defineConfig({
     : process.env.CI ? 2 : undefined,
   timeout: 30_000,
   retries: process.env.CI ? 2 : 0,
-  reporter: [['list'], ['html', { outputFolder: 'playwright-report', open: 'never' }]],
+  reporter: [
+    ['list'],
+    ['html', { outputFolder: 'playwright-report', open: 'never' }],
+    ['json', { outputFile: 'test-results/playwright-results.json' }],
+    ['junit', { outputFile: 'test-results/playwright-results.xml' }],
+  ],
   projects: [
     {
       name: 'setup',
