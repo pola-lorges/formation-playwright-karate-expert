@@ -1,0 +1,249 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light">
+  <title>Playwright | Présentation du projet J01 à J10</title>
+  <style>
+    :root { --ink:#202a28; --muted:#52605b; --paper:#f5f6f2; --white:#fff; --line:#d5ddd6; --green:#24594c; --green-light:#e4efe8; --coral:#b9533e; --yellow:#f3d87a; --mono:ui-monospace, SFMono-Regular, Consolas, monospace; }
+    * { box-sizing:border-box; }
+    html { scroll-behavior:smooth; scroll-padding-top:2rem; }
+    body { margin:0; color:var(--ink); background:var(--paper); font-family:Georgia, 'Times New Roman', serif; line-height:1.55; }
+    a { color:var(--green); text-underline-offset:.18em; }
+    a:hover { color:var(--coral); }
+    a:focus-visible { outline:3px solid var(--coral); outline-offset:3px; }
+    .skip { position:absolute; left:1rem; top:-5rem; z-index:10; padding:.7rem; background:var(--white); }
+    .skip:focus { top:1rem; }
+    .layout { display:grid; grid-template-columns:255px minmax(0, 1fr); min-height:100vh; }
+    .sidebar { position:sticky; top:0; align-self:start; height:100vh; overflow:auto; background:#193d35; color:#f6faf6; padding:2rem 1.5rem; font-family:'Trebuchet MS', sans-serif; }
+    .brand { display:flex; align-items:center; gap:.75rem; padding-bottom:1.5rem; border-bottom:1px solid #66877d; }
+    .brand-mark { display:grid; place-items:center; width:2.5rem; height:2.5rem; background:var(--yellow); color:#193d35; font-weight:bold; font-family:var(--mono); }
+    .brand strong, .brand span { display:block; }
+    .brand span { color:#d5e5dc; font-size:.75rem; }
+    .nav-title { margin:1.7rem 0 .55rem; color:#c3d9cd; font-size:.7rem; font-weight:bold; text-transform:uppercase; }
+    .sidebar nav a { display:block; padding:.34rem .45rem; color:#f5faf6; font-size:.85rem; text-decoration:none; border-left:2px solid transparent; }
+    .sidebar nav a:hover, .sidebar nav a:focus-visible { border-left-color:var(--yellow); background:#31574d; }
+    .sidebar nav a span { display:inline-block; width:2.6rem; color:#c2d8ca; font-family:var(--mono); font-size:.72rem; }
+    main { min-width:0; }
+    .intro, .content, footer { padding-left:clamp(1.25rem, 5%, 5rem); padding-right:clamp(1.25rem, 5%, 5rem); }
+    .intro { background:#e4ede6; border-bottom:1px solid #c8d8cd; padding-top:3rem; padding-bottom:2.7rem; }
+    .inner { max-width:1100px; margin:auto; }
+    .eyebrow, .section-kicker, .label { font-family:'Trebuchet MS', sans-serif; font-size:.72rem; font-weight:bold; text-transform:uppercase; color:var(--green); }
+    h1 { max-width:900px; margin:.6rem 0 1rem; font-size:clamp(2.2rem, 4rem, 4rem); line-height:1.04; font-weight:normal; }
+    .intro p { max-width:760px; margin:0; font-size:1.15rem; color:#3e554c; }
+    .intro-meta { display:flex; flex-wrap:wrap; gap:.65rem 1.5rem; margin-top:1.8rem; font-family:'Trebuchet MS', sans-serif; font-size:.8rem; }
+    .intro-meta strong { color:var(--green); }
+    .content { padding-top:1rem; padding-bottom:3rem; }
+    section { padding:2.8rem 0; border-bottom:1px solid var(--line); }
+    section:last-child { border-bottom:0; }
+    .section-heading { display:grid; grid-template-columns:5rem minmax(0, 1fr); gap:1rem; align-items:start; }
+    .day { font-family:var(--mono); font-size:.8rem; font-weight:bold; color:var(--coral); padding-top:.35rem; }
+    h2 { margin:0; font-size:2rem; line-height:1.15; font-weight:normal; }
+    h3 { margin:0 0 .5rem; font-family:'Trebuchet MS', sans-serif; font-size:1rem; }
+    p { margin:.6rem 0 1rem; }
+    .lead { max-width:760px; font-size:1.1rem; color:#40544b; }
+    .section-body { margin-left:6rem; }
+    .columns { display:grid; grid-template-columns:repeat(2, minmax(0, 1fr)); gap:1.2rem 2.5rem; margin-top:1.5rem; }
+    .columns > div { min-width:0; }
+    ul, ol { padding-left:1.25rem; margin:.5rem 0 1rem; }
+    li { margin:.35rem 0; }
+    .note { margin:1.4rem 0; padding:1rem 1.2rem; border-left:4px solid var(--coral); background:#fff6ee; }
+    .note p:last-child { margin-bottom:0; }
+    .flow { display:flex; flex-wrap:wrap; gap:.5rem; padding:0; list-style:none; font-family:'Trebuchet MS', sans-serif; font-size:.85rem; }
+    .flow li { margin:0; padding:.6rem .8rem; background:var(--green-light); border:1px solid #cbded0; }
+    .flow li:not(:last-child)::after { content:' →'; color:var(--green); font-weight:bold; }
+    .table-wrap { overflow-x:auto; margin:1.2rem 0; }
+    table { width:100%; border-collapse:collapse; text-align:left; font-size:.95rem; }
+    th, td { padding:.7rem .75rem; border-bottom:1px solid var(--line); vertical-align:top; }
+    th { background:#e8eee8; font-family:'Trebuchet MS', sans-serif; font-size:.8rem; }
+    code { font-family:var(--mono); font-size:.85em; overflow-wrap:anywhere; }
+    pre { overflow:auto; margin:1rem 0; padding:1rem 1.2rem; background:#263b35; color:#f7fbf6; line-height:1.65; }
+    pre code { overflow-wrap:normal; }
+    .sources { font-family:'Trebuchet MS', sans-serif; font-size:.8rem; color:var(--muted); }
+    .sources a { margin-right:.7rem; }
+    .summary-grid { display:grid; grid-template-columns:repeat(3, minmax(0, 1fr)); gap:1px; margin:1.5rem 0; background:var(--line); border:1px solid var(--line); }
+    .summary-grid > div { background:var(--white); padding:1.2rem; }
+    .summary-grid strong { display:block; color:var(--green); font-size:1.65rem; font-weight:normal; }
+    .summary-grid span { font-family:'Trebuchet MS', sans-serif; font-size:.8rem; }
+    footer { padding-top:1.5rem; padding-bottom:2rem; color:var(--muted); font-family:'Trebuchet MS', sans-serif; font-size:.8rem; }
+    @media (max-width:760px) {
+      .layout { display:block; }
+      .sidebar { position:static; height:auto; padding:1rem 1.25rem; }
+      .brand { padding-bottom:.8rem; }
+      .nav-title { margin:.9rem 0 .35rem; }
+      .sidebar nav { display:flex; flex-wrap:nowrap; gap:.15rem; overflow-x:auto; }
+      .sidebar nav a { flex:0 0 auto; padding:.35rem .45rem; white-space:nowrap; }
+      .sidebar nav a span { width:auto; margin-right:.3rem; }
+      .intro { padding-top:2rem; padding-bottom:2rem; }
+      h1 { font-size:2.2rem; overflow-wrap:anywhere; }
+      .section-heading { grid-template-columns:3rem minmax(0, 1fr); gap:.5rem; }
+      .section-body { margin-left:0; }
+      .columns, .summary-grid { grid-template-columns:1fr; }
+      h2 { font-size:1.65rem; }
+    }
+    @media (prefers-reduced-motion:reduce) { html { scroll-behavior:auto; } }
+  </style>
+</head>
+<body>
+  <a class="skip" href="#contenu">Aller au contenu</a>
+  <div class="layout">
+    <aside class="sidebar" aria-label="Sommaire du projet">
+      <div class="brand"><div class="brand-mark" aria-hidden="true">QA</div><div><strong>Playwright</strong><span>Journal de projet · J01–J10</span></div></div>
+      <p class="nav-title">Parcours</p>
+      <nav aria-label="Navigation dans la présentation">
+        <a href="#vue-ensemble"><span>00</span> Vue d’ensemble</a>
+        <a href="#j01"><span>J01</span> Architecture &amp; login</a>
+        <a href="#j02"><span>J02</span> POM &amp; création</a>
+        <a href="#j03"><span>J03</span> Fixtures</a>
+        <a href="#j04"><span>J04</span> Rôles &amp; sessions</a>
+        <a href="#j05"><span>J05</span> Upload &amp; aperçu</a>
+        <a href="#j06"><span>J06</span> Authentification API</a>
+        <a href="#j07"><span>J07</span> Mocks réseau</a>
+        <a href="#j08"><span>J08</span> Jeux de données</a>
+        <a href="#j09"><span>J09</span> Stabilité</a>
+        <a href="#j10"><span>J10</span> Diagnostic &amp; rapports</a>
+        <a href="#bilan"><span>11</span> Bilan &amp; perspectives</a>
+        <a href="#commandes"><span>12</span> Commandes</a>
+      </nav>
+    </aside>
+    <main id="contenu">
+      <header class="intro"><div class="inner">
+        <div class="eyebrow">Dossier de projet / automatisation QA</div>
+        <h1>Playwright : de l’authentification au diagnostic</h1>
+        <p>Un parcours en dix étapes pour structurer les tests d’une application, exercer ses parcours clients et rendre les échecs exploitables.</p>
+        <div class="intro-meta"><span><strong>Stack</strong> TypeScript · Playwright</span><span><strong>Périmètre</strong> UI · API · réseau</span><span><strong>Lecture</strong> J01 à J10</span></div>
+      </div></header>
+      <div class="content"><div class="inner">
+        <section id="vue-ensemble" aria-labelledby="titre-vue">
+          <div class="section-heading"><div class="day">00</div><div><div class="section-kicker">Cadre</div><h2 id="titre-vue">Vue d’ensemble</h2></div></div>
+          <div class="section-body">
+            <p class="lead">Le projet organise des tests de parcours, de contrôle d’accès et de comportement UI face à des réponses API contrôlées. Les étiquettes J01 à J10 désignent des étapes du parcours, pas des dates de réalisation vérifiées.</p>
+            <div class="summary-grid"><div><strong>10</strong><span>étapes thématiques</span></div><div><strong>3</strong><span>projets de test : admin, user, chromium</span></div><div><strong>4</strong><span>sorties de reporting : liste, HTML, JSON, JUnit</span></div></div>
+            <h3>Organisation</h3>
+            <ul class="flow"><li>Configuration &amp; environnement</li><li>Pages &amp; composants</li><li>Fixtures &amp; sessions</li><li>Tests UI / API / mocks</li><li>Rapports &amp; triage</li></ul>
+            <p>Le projet <code>setup</code> prépare les sessions utilisées par <code>admin</code> et <code>user</code>. Le projet <code>chromium</code> exécute les scénarios du répertoire UI. Les tests nécessitent une application accessible et des comptes de test configurés.</p>
+            <p class="sources">Sources : <a href="playwright.config.ts">Configuration Playwright</a><a href="package.json">Scripts et dépendances</a></p>
+          </div>
+        </section>
+        <section id="j01" aria-labelledby="titre-j01">
+          <div class="section-heading"><div class="day">J01</div><div><div class="section-kicker">Fondations</div><h2 id="titre-j01">Architecture et parcours de connexion</h2></div></div>
+          <div class="section-body"><p class="lead">Poser une structure lisible et vérifier un premier parcours utilisateur de bout en bout.</p>
+            <div class="columns"><div><h3>Organisation du code</h3><p>Les scénarios Gherkin vivent dans <code>features/</code>, leurs étapes Playwright dans <code>steps/</code>, les objets de page dans <code>pages/</code> et les éléments partagés dans <code>components/</code>. La configuration se trouve dans <code>playwright.config.ts</code> et les paramètres sensibles sont chargés depuis l’environnement.</p></div><div><h3>Parcours vérifié</h3><p>Ouverture de la connexion, saisie des identifiants, contrôle de l’URL et du titre du tableau de bord, puis déconnexion et retour à la page de login.</p></div></div>
+            <p class="sources">Sources : <a href="tests/ui/login.spec.ts">Test de connexion</a><a href="pages/login.page.ts">LoginPage</a><a href="utils/env.ts">Variables d’environnement</a></p>
+          </div>
+        </section>
+        <section id="j02" aria-labelledby="titre-j02">
+          <div class="section-heading"><div class="day">J02</div><div><div class="section-kicker">Modélisation</div><h2 id="titre-j02">Page Object Model et création client</h2></div></div>
+          <div class="section-body"><p class="lead">Centraliser les interactions avec les pages pour garder les scénarios métier compréhensibles.</p>
+            <p><code>LoginPage</code>, <code>DashboardPage</code> et <code>ClientPage</code> encapsulent les actions utilisées par le test : se connecter, accéder aux clients et créer un enregistrement. Le nom du client combine l’index du worker et l’horodatage pour limiter les collisions ; le scénario vérifie ensuite sa présence dans la liste.</p>
+            <div class="note"><strong>Portée.</strong> Le test exerce une création réelle sur l’application configurée : prévoir un environnement et des données de test adaptés.</div>
+            <p class="sources">Sources : <a href="tests/ui/client.spec.ts">Scénario de création</a><a href="pages/client.page.ts">ClientPage</a><a href="pages/dashboard.page.ts">DashboardPage</a></p>
+          </div>
+        </section>
+        <section id="j03" aria-labelledby="titre-j03">
+          <div class="section-heading"><div class="day">J03</div><div><div class="section-kicker">Réutilisation</div><h2 id="titre-j03">Une fixture de page authentifiée</h2></div></div>
+          <div class="section-body"><p>La fixture personnalisée <code>authenticatedPage</code> étend le test Playwright : elle ouvre la page de connexion, effectue le login avec le compte configuré, puis fournit la page au scénario via <code>use(page)</code>. Le test du tableau de bord peut ainsi se concentrer sur son assertion.</p><p>Cette fixture effectue une connexion UI ; elle est distincte du mécanisme de sessions enregistrées introduit pour les rôles.</p>
+            <p class="sources">Sources : <a href="fixtures/test.ts">Fixture</a><a href="tests/ui/dashboard.spec.ts">Test du tableau de bord</a></p>
+          </div>
+        </section>
+        <section id="j04" aria-labelledby="titre-j04">
+          <div class="section-heading"><div class="day">J04</div><div><div class="section-kicker">Contrôle d’accès</div><h2 id="titre-j04">Rôles et réutilisation des sessions</h2></div></div>
+          <div class="section-body"><p class="lead">Séparer les attentes ADMIN et USER et éviter de répéter la connexion dans chaque scénario de rôle.</p>
+            <ol><li>Le projet <code>setup</code> connecte chaque rôle par l’interface et enregistre son <code>storageState</code> dans <code>.auth/</code>.</li><li>Les projets <code>admin</code> et <code>user</code> dépendent de ce setup et chargent l’état associé.</li><li>ADMIN accède au tableau de bord et à Clients ; USER ne voit pas le module dans la navigation et ne peut pas l’ouvrir directement selon les assertions des tests.</li></ol>
+            <div class="note"><strong>Attention aux secrets.</strong> Les états d’authentification et identifiants sont sensibles ; les conserver hors du versionnement et utiliser des comptes de test.</div>
+            <p class="sources">Sources : <a href="tests/auth.setup.ts">Setup des rôles</a><a href="tests/admin/access.spec.ts">Accès ADMIN</a><a href="tests/user/access.spec.ts">Accès USER</a></p>
+          </div>
+        </section>
+        <section id="j05" aria-labelledby="titre-j05">
+          <div class="section-heading"><div class="day">J05</div><div><div class="section-kicker">Interaction</div><h2 id="titre-j05">Upload et aperçu du logo</h2></div></div>
+          <div class="section-body"><p>Dans le dialogue d’ajout de client, le test injecte un PNG en mémoire avec <code>setInputFiles</code>, puis vérifie que l’image d’aperçu est visible et que son attribut <code>src</code> est une data URL PNG. Il attend ensuite quatre secondes et annule le dialogue : le scénario ne crée pas de client.</p><p>Cette attente fixe existe dans le test ; une attente liée à un état observable serait une piste d’amélioration si elle répond au besoin métier.</p>
+            <p class="sources">Source : <a href="tests/admin/complex-interactions.spec.ts">Test d’interaction complexe</a></p>
+          </div>
+        </section>
+        <section id="j06" aria-labelledby="titre-j06">
+          <div class="section-heading"><div class="day">J06</div><div><div class="section-kicker">API + interface</div><h2 id="titre-j06">Connexion API et reprise côté UI</h2></div></div>
+          <div class="section-body"><p class="lead">Relier l’identité obtenue par API à une navigation authentifiée dans l’interface.</p>
+            <ol><li>Partir d’un stockage vide, ouvrir <code>/login</code> et attendre le jeton CSRF dans <code>sessionStorage</code>.</li><li>Effectuer le login API avec ce jeton, puis appeler <code>/users/me</code> avec l’access token et comparer l’email au compte attendu.</li><li>Installer le cookie et les éléments de session nécessaires dans le navigateur, puis ouvrir <code>/clients</code> et vérifier le titre « Gestion des clients ».</li></ol>
+            <p>Ce scénario teste l’intégration réelle avec l’API et l’application configurées ; il ne se limite pas à une réponse simulée.</p>
+            <p class="sources">Sources : <a href="tests/admin/client-api-ui.spec.ts">Scénario API / UI</a><a href="api/client.api.ts">Client d’authentification API</a></p>
+          </div>
+        </section>
+        <section id="j07" aria-labelledby="titre-j07">
+          <div class="section-heading"><div class="day">J07</div><div><div class="section-kicker">Isolation réseau</div><h2 id="titre-j07">Mocks des réponses clients</h2></div></div>
+          <div class="section-body"><p>Les routes Playwright interceptent l’API clients pour vérifier la réaction de l’interface, sans dépendre de la réponse réelle de cet endpoint. Les tests vérifient également que les requêtes ont bien été interceptées.</p>
+            <div class="table-wrap"><table><thead><tr><th scope="col">Cas simulé</th><th scope="col">Comportement vérifié</th></tr></thead><tbody>
+              <tr><td><code>200</code></td><td>Le client et sa ville apparaissent dans la liste.</td></tr>
+              <tr><td><code>400</code></td><td>Affichage de « Aucun client trouvé ».</td></tr>
+              <tr><td><code>401</code> + refresh <code>401</code></td><td>Retour à la connexion, après interception des deux requêtes.</td></tr>
+              <tr><td><code>500</code></td><td>Affichage de l’état vide.</td></tr>
+              <tr><td>Timeout</td><td>Requête interrompue avec <code>abort('timedout')</code> ; état vide vérifié.</td></tr>
+            </tbody></table></div>
+            <p>Ces contrôles décrivent le comportement actuellement attendu par les tests, pas nécessairement le traitement idéal de chaque erreur.</p>
+            <p class="sources">Source : <a href="tests/admin/mocking-api.spec.ts">Scénarios de mocks</a></p>
+          </div>
+        </section>
+        <section id="j08" aria-labelledby="titre-j08">
+          <div class="section-heading"><div class="day">J08</div><div><div class="section-kicker">Paramétrisation</div><h2 id="titre-j08">Dix cas pilotés par les données</h2></div></div>
+          <div class="section-body"><p>Le fichier JSON contient dix clients. Le plan du scénario Gherkin reprend ces dix cas dans une table d’exemples et génère un test distinct par entrée ; chaque cas construit une réponse API simulée et vérifie le titre, le nom, la ville et le pays affichés, ainsi que l’interception de la requête.</p><p>Cette approche élargit la variété des données tout en gardant un scénario commun. Elle vérifie l’affichage de données simulées, et non la création ou la persistance de dix clients réels. La table d’exemples et le JSON doivent rester cohérents.</p>
+            <p class="sources">Sources : <a href="datas/clients.json">Jeu de données</a><a href="features/admin/clients-donnees.feature">Scénarios paramétrés</a></p>
+          </div>
+        </section>
+        <section id="j09" aria-labelledby="titre-j09">
+          <div class="section-heading"><div class="day">J09</div><div><div class="section-kicker">Fiabilité</div><h2 id="titre-j09">Latence, attentes et retries</h2></div></div>
+          <div class="section-body"><p class="lead">Observer la synchronisation face à une latence variable, sans confondre une relance réussie avec une exécution stable.</p>
+            <div class="columns"><div><h3>Scénario</h3><p>La réponse clients simulée est retardée aléatoirement jusqu’à 500 ms. Après navigation, <code>expect(...).toBeVisible()</code> attend l’apparition du client : l’attente porte sur le résultat observable plutôt que sur une durée fixe côté test.</p></div><div><h3>Politique de retry</h3><p>La configuration prévoit <strong>2 retries en CI</strong> et <strong>0 en local</strong>. Un test qui échoue puis réussit au retry est suivi séparément comme flaky dans les KPI.</p></div></div>
+            <h3>Protocole des 20 essais</h3><pre><code>npm run test:j09 -- --repeat-each=20 --retries=0</code></pre>
+            <p>Compter les réussites et échecs dans le rapport de cette exécution, puis conserver le rapport JSON et les traces pertinentes. Désactiver les retries rend visibles les échecs de chaque répétition ; le setup et l’environnement restent des dépendances du parcours.</p>
+            <div class="note"><strong>Mesures réalisées pendant l’exercice.</strong> La lecture immédiate a échoué 20 fois sur 20 avec une latence allant jusqu’à 2,2 secondes. Après une première correction, des échecs persistaient ; avec une latence réduite à 500 ms et un worker, 20 répétitions ont réussi. Les conditions ayant changé, cela ne prouve pas à lui seul que toute la suite est stable.</div>
+            <p class="sources">Sources : <a href="tests/admin/mocking-api.spec.ts">Scénario J09</a><a href="playwright.config.ts">Retries et artefacts</a><a href="QUALITY_KPIS.md">Définition des KPI</a></p>
+          </div>
+        </section>
+        <section id="j10" aria-labelledby="titre-j10">
+          <div class="section-heading"><div class="day">J10</div><div><div class="section-kicker">Observabilité</div><h2 id="titre-j10">Traces, rapports et triage</h2></div></div>
+          <div class="section-body"><p class="lead">Faire d’un échec une enquête reproductible, avec des preuves et des hypothèses clairement distinguées.</p>
+            <h3>Nature du test J10</h3><p>Il s’agit d’un <strong>test de diagnostic positif avec réponse API 200 simulée</strong>. Trois <code>test.step</code> ouvrent la liste, joignent la réponse JSON au rapport et vérifient l’affichage de « QA Diagnostic Client ». Ce n’est ni un test d’échec volontaire, ni un appel réel à l’API clients.</p>
+            <div class="columns"><div><h3>Artefacts Playwright</h3><p>La configuration conserve trace et vidéo en cas d’échec et prend une capture en cas d’échec. Les reporters produisent une liste console, un rapport HTML, un JSON et un JUnit.</p></div><div><h3>Triage</h3><p><code>report:failures</code> produit un classement initial des échecs ; une analyse des traces, du réseau et des données est nécessaire pour confirmer la cause. Les timeouts sont ambigus.</p></div></div>
+            <pre><code>npm run test:j10
+npm run report:failures
+npm run report:kpi
+npx playwright show-report playwright-report
+npx playwright show-trace chemin/vers/trace.zip</code></pre>
+            <p>Les scripts de reporting exploitent les résultats JSON disponibles : leur portée est celle du run qui les a produits, pas nécessairement celle de toute la suite.</p>
+            <p class="sources">Sources : <a href="tests/admin/mocking-api.spec.ts">Test J10</a><a href="failure-triage.md">Workflow de triage</a><a href="QUALITY_KPIS.md">KPI qualité</a></p>
+          </div>
+        </section>
+        <section id="bilan" aria-labelledby="titre-bilan">
+          <div class="section-heading"><div class="day">11</div><div><div class="section-kicker">Synthèse</div><h2 id="titre-bilan">Bilan et perspectives</h2></div></div>
+          <div class="section-body"><div class="columns"><div><h3>Ce que le projet couvre</h3><ul><li>Parcours UI structurés en objets de page et fixtures.</li><li>Sessions par rôle et articulation API / navigateur.</li><li>Cas réseau simulés, données paramétrées et diagnostic instrumenté.</li><li>Rapports exploitables et classification initiale des échecs.</li></ul></div><div><h3>Prochaines étapes</h3><ul><li>Conserver les résultats des répétitions J09 et comparer les exécutions.</li><li>Réduire les attentes fixes et isoler les données créées.</li><li>Compléter les contrôles d’erreur et confirmer les causes avec les traces.</li><li>Calibrer les KPI sur une référence représentative et suivre les limites de couverture.</li></ul></div></div>
+            <div class="note"><strong>Prudence sur le statut.</strong> Cette présentation décrit le code et son intention. Les tags J01 à J10 représentent une progression pédagogique, pas des dates de réalisation attestées ; les résultats dépendent du run, de l’environnement, des comptes et des données disponibles.</div>
+          </div>
+        </section>
+        <section id="commandes" aria-labelledby="titre-commandes">
+          <div class="section-heading"><div class="day">12</div><div><div class="section-kicker">Exécution</div><h2 id="titre-commandes">Commandes utiles</h2></div></div>
+          <div class="section-body"><p>À lancer depuis le répertoire <code>playwright/</code>, après installation des dépendances et du navigateur, configuration de l’environnement et mise à disposition de l’application cible et des comptes de test. Ne pas exposer les identifiants.</p>
+            <pre><code>npm install
+npx playwright install chromium
+npm test
+npm run test:j01
+npm run test:j02
+npm run test:j03
+npm run test:j04
+npm run test:j05
+npm run test:j06
+npm run test:j07
+npm run test:j08
+npm run test:j09
+npm run test:j10
+npm run test:ui
+npm run test:report</code></pre>
+            <p>Les commandes par journée filtrent les tests par étiquette ; les dépendances de projet peuvent également déclencher le setup. <code>test:report</code> génère le triage et les KPI avant d’ouvrir le rapport HTML existant.</p>
+            <p class="sources">Sources : <a href="package.json">Scripts npm</a><a href="playwright.config.ts">Configuration</a><a href="utils/env.ts">Variables requises</a></p>
+          </div>
+        </section>
+      </div></div>
+      <footer><div class="inner">Projet Playwright / Présentation J01–J10 · Les sources liées font référence à l’état local du projet.</div></footer>
+    </main>
+  </div>
+</body>
+</html>

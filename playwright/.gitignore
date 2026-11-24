@@ -2,5 +2,7 @@
 .auth/
 node_modules/
 playwright-report/
+allure-report/
 test-results/
+.features-gen/
 public/
