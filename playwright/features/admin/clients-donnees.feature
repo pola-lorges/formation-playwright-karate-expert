@@ -1,10 +1,10 @@
-# language: fr
+# language: en
 @J08 @regression
-Fonctionnalité: Affichage des clients avec des données simulées
-  Plan du scénario: Afficher <nom> à <ville>
-    Alors le client simulé administrateur "<id>" nommé "<nom>" à "<ville>" dans "<pays>" est affiché
+Feature: Affichage des clients avec des données simulées
+  Scenario Outline: Afficher <nom> à <ville>
+    Then le client simulé administrateur "<id>" nommé "<nom>" à "<ville>" dans "<pays>" est affiché
 
-    Exemples:
+    Examples:
       | id              | nom               | ville      | pays     |
       | mock-client-001 | QA Client Alpha   | Bafoussam  | Cameroun |
       | mock-client-002 | QA Client Bravo   | Douala     | Cameroun |
